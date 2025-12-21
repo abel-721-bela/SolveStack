@@ -1,0 +1,43 @@
+# Core scraping and data
+praw==7.8.1
+pandas>=2.0.0,<3.0.0
+pygithub>=2.1.1
+
+# NLP
+nltk==3.9.2
+
+# PyTorch (stable CPU versions)
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.5.1+cpu
+torchvision==0.20.1+cpu
+torchaudio==2.5.1+cpu
+
+# AI models
+transformers==4.57.3
+
+# Utilities
+tqdm==4.67.1
+requests>=2.28.1,<2.33.0
+regex
+
+# FastAPI and web server
+fastapi>=0.109.0
+uvicorn[standard]>=0.27.0
+python-multipart>=0.0.6  # For OAuth2PasswordRequestForm
+
+# Database
+sqlalchemy>=2.0.0
+psycopg2-binary>=2.9.9  # PostgreSQL adapter
+
+# Phase 3.1: Database Migration & Production Infrastructure
+alembic                # Database schema versioning and migrations
+
+# Authentication
+python-jose[cryptography]>=3.3.0  # JWT tokens
+passlib[bcrypt]>=1.7.4  # Password hashing
+
+# Environment variables
+python-dotenv>=1.0.0
+
+# Firebase (for real-time collaboration chat)
+firebase-admin>=6.0.0

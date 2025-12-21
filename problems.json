@@ -1,0 +1,208 @@
+[
+    {
+        "ps_id": 1,
+        "title": "best llm for image analisis/parsing?",
+        "description": "so in the project i'm developing i need to implement a feature that consists reading info off of a photo of an invoice. my progress currently consists in a tool that uses the chatgpt api to which i can provide a url of an image, a role, a model and a prompt. in the role i just say it's an image parser, and in the prompt i just ask it to read the details and only return a json (i provide a template). i haven't had much success, i've used gpt-4.1 and gpt-4o, and it returns some of the data wrong. i dont expect it to be perfect since the info will still need some human control. any sugestions to improve? should i switch to another llm like gemini? maybe use another model? some other image format? or just convince the client to use pdfs?",
+        "source": "reddit/learnprogramming",
+        "date": "2025-12-02",
+        "suggested_tech": "General Tech",
+        "author_name": "Unusual-Judge-319",
+        "author_id": "iwtt9mka",
+        "reference_link": "https://reddit.com/r/learnprogramming/comments/1pbmrk5/best_llm_for_image_analisisparsing/",
+        "tags": [
+            "Debugging"
+        ]
+    },
+    {
+        "ps_id": 2,
+        "title": "aws lab error help",
+        "description": "hi, i'm having some trouble with my aws lab. here is the code that aws lab told me to copy and paste: { \"comment\": \"a description of my state machine\", \"startat\": \"create glue db\", \"states\": { \"create glue db\": { \"type\": \"task\", \"resource\": \"arn:aws:states:::athena:startqueryexecution.sync\", \"parameters\": { \"querystring\": \"create database if not exists nyctaxidb\", \"workgroup\": \"primary\", \"resultconfiguration\": { \"outputlocation\": \"s3://gluelab--fb01e5b0/athena/\" } }, \"next\": \"run table lookup\" }, \"run table lookup\": { \"type\": \"task\", \"resource\": \"arn:aws:states:::athena:startqueryexecution.sync\", \"parameters\": { \"querystring\": \"show tables in nyctaxidb\", \"workgroup\": \"primary\", \"resultconfiguration\": { \"outputlocation\": \"s3://gluelab--fb01e5b0/athena/\" } }, \"next\": \"get lookup query results\" }, \"get lookup query results\": { \"type\": \"task\", \"resource\": \"arn:aws:states:::athena:getqueryresults\", \"parameters\": { \"queryexecutionid.$\": \"$.queryexecution.queryexecutionid\" }, \"end\": true } } }",
+        "source": "reddit/aws",
+        "date": "2025-12-02",
+        "suggested_tech": "SQL",
+        "author_name": "kevin17re5",
+        "author_id": "2fgm7vfh",
+        "reference_link": "https://reddit.com/r/aws/comments/1pbz3z1/aws_lab_error_help/",
+        "tags": [
+            "technical question"
+        ]
+    },
+    {
+        "ps_id": 3,
+        "title": "ai-based automatic cost allocation tagging as a graduation project",
+        "description": "i\u2019m a final-year student and i\u2019m considering building an ai-based automatic cost tagging + financial chatbot system as my graduation project. if anyone here has experience with this kind of finops automation, i\u2019d really appreciate some guidance on architecture and real challenges, or any suggestions to make this more realistic and useful.",
+        "source": "reddit/aws",
+        "date": "2025-12-02",
+        "suggested_tech": "AI",
+        "author_name": "ExtraLife6520",
+        "author_id": "a1q2e0sz",
+        "reference_link": "https://reddit.com/r/aws/comments/1pbq5ya/aibased_automatic_cost_allocation_tagging_as_a/",
+        "tags": [
+            "discussion"
+        ]
+    },
+    {
+        "ps_id": 4,
+        "title": "building ai agents you can trust with your customer data",
+        "description": "",
+        "source": "reddit/aws",
+        "date": "2025-12-01",
+        "suggested_tech": "AI",
+        "author_name": "growth_man",
+        "author_id": "baajg5kk",
+        "reference_link": "https://reddit.com/r/aws/comments/1pbb243/building_ai_agents_you_can_trust_with_your/",
+        "tags": [
+            "article"
+        ]
+    },
+    {
+        "ps_id": 5,
+        "title": "aws mcp server v1.5.6 \u2013 added native sandboxing and hardened docker support \ud83d\udee1\ufe0f",
+        "description": "i maintain the open-source aws mcp server, which allows llms like claude to interface with the aws cli. the goal is to provide a secure way for ai agents to use aws cli tool to manage cloud resources. i just pushed v1.5.6, which is a significant security overhaul compared to the 1.3.x versions. the main goal was to ensure that allowing an llm to execute shell commands without compromising the host machine. key changes: * sandboxed execution: cli commands are now wrapped in native os sandboxes (using seatbelt on macos \ud83c\udf4e). this strictly limits file system access during execution. * docker hardening: the container image has been locked down. it now runs as a non-root user with a read-only root filesystem and dropped capabilities \ud83d\udc33 * simplification: i removed custom permission logic in favor of a standard \"iam + sandbox + (docker)\" model. you rely on iam for cloud permissions and the sandbox for local safety. give it a try via `uvx aws-mcp` or check out the project on github: [",
+        "source": "reddit/aws",
+        "date": "2025-12-01",
+        "suggested_tech": "Cloud, AI",
+        "author_name": "alexei_led",
+        "author_id": "w95t4",
+        "reference_link": "https://reddit.com/r/aws/comments/1pb9v8c/aws_mcp_server_v156_added_native_sandboxing_and/",
+        "tags": [
+            "technical resource"
+        ]
+    },
+    {
+        "ps_id": 6,
+        "title": "built an open-source website understanding sdk - define how agents should understand & act on any website",
+        "description": "website understanding sdk a tiny typescript library that lets you define exactly how an agent should understand a specific website. instead of guessing dom or hallucinating selectors, you simply create a schema: export const examplecom = createwebsitesdk({ domains: [\"example.com\"], elements: { searchinput: \"input[name=q]\", searchbutton: \"button[type=submit]\", resultlinks: \"a.result\" }, actions: { search: { type: \"input+click\", input: \"searchinput\", click: \"searchbutton\" } } }); what the sdk gives you: \u2705 standardized model of the website \u2705 clean selectors (css \u2192 stable names) \u2705 structured actionable elements \u2705 action templates (\u201cclick\u201d, \u201cinput\u201d, \u201csearch\u201d, etc.) \u2705 consistent data for agents, routers, and browsers works with playwright / puppeteer / any automation tool what it solves: llms shouldn\u2019t be guessing selectors. autonomous agents shouldn\u2019t get stuck because \u201cbutton[3]\u201d changed. this sdk makes websites predictable, turning them into apis for agents. happy to take feedback or add more built-in schemas if people want examples.",
+        "source": "reddit/javascript",
+        "date": "2025-12-01",
+        "suggested_tech": "General Tech",
+        "author_name": "Impossible_Tree_5634",
+        "author_id": "rgcmwpsx",
+        "reference_link": "https://reddit.com/r/javascript/comments/1pbfqch/built_an_opensource_website_understanding_sdk/",
+        "tags": []
+    },
+    {
+        "ps_id": 7,
+        "title": "mcputil 0.6.0: enable code execution with mcp for you.",
+        "description": "# what my project does `mcputil 0.6.0` comes with a cli for generating a file tree of all available tools from connected mcp servers, which helps with [code execution with mcp]( # why as mcp usage scales, there are two common patterns that can increase agent cost and latency: 1. tool definitions overload the context window; 2. intermediate tool results consume additional tokens. as a solution, code execution with mcp thus came into being: 1. present mcp servers as code apis rather than direct tool calls; 2. the agent can then write code to interact with mcp servers. this approach addresses both challenges: agents can load only the tools they need and process data in the execution environment before passing results back to the model. # prerequisites install `mcputil`: pip install mcputil install dependencies: pip install deepagents pip install langchain-community pip install langchain-experimental # quickstart run the mcp servers: python examples/code-execution/google_drive.py # in another terminal python examples/code-execution/salesforce.py generate a file tree of all available tools from mcp servers: mcputil \\ --server='{\"name\": \"google_drive\", \"url\": \" \\ --server='{\"name\": \"salesforce\", \"url\": \" \\ -o examples/code-execution/output/servers run the example agent: export anthropic_api_key=\"your-api-key\" python examples/code-execution/agent.py",
+        "source": "reddit/Python",
+        "date": "2025-12-01",
+        "suggested_tech": "Python",
+        "author_name": "RussellLuo",
+        "author_id": "wy4vd",
+        "reference_link": "https://reddit.com/r/Python/comments/1pb4wjg/mcputil_060_enable_code_execution_with_mcp_for_you/",
+        "tags": [
+            "Showcase"
+        ]
+    },
+    {
+        "ps_id": 8,
+        "title": "i built a tool to sync google calendar + gmail labels to my crm. would you use this?",
+        "description": "i run a small automation agency, and i was manually updating my crm after each meeting. that was time consuming so i decided to automate it. **this is what it does:** **1. it watches my google calendar** * if i have a meeting with a **new person**, the system automatically creates a lead in the crm. * if they are an **existing client**, it logs the meeting to their timeline. * *result:* i never have to manually create a contact again. **2. the \"gmail label\" trick (my favorite part)** * i use gemini to email me summaries of the calls. * i just apply a gmail label called **\"meeting notes\"**. * the system grabs that email, finds the right client in our database, and saves the transcript to their \"files\" tab automatically. **3. it writes my to-do list (i also have a project management module in my crm)** * it reads the transcript for \"next steps\" and \"deadlines.\" * it automatically creates tasks in the crm [google calendar sync]( [extracts all the \\\\\"lead\\\\\" information from meetings that i had]( [extracts the next steps from notes and uses my \\\\\"follow upas\\\\\"]( [integration settings]( **the result:** i finish a meeting and my crm is already updated. **the limitation:** it adds all the people you had a meeting, so you have to do some cleaning after. **my question:** i\u2019m considering creating a product from it; for those who use crms like **notion** or **zoho bigin**. is this a real pain for you? or are you happy with your current setup?",
+        "source": "reddit/automation",
+        "date": "2025-12-02",
+        "suggested_tech": "Machine Learning, AI, Android",
+        "author_name": "balance006",
+        "author_id": "gfuscu7s",
+        "reference_link": "https://reddit.com/r/automation/comments/1pbuawx/i_built_a_tool_to_sync_google_calendar_gmail/",
+        "tags": []
+    },
+    {
+        "ps_id": 9,
+        "title": "accidentally saved a client ~$30k a year just by watching how they actually worked",
+        "description": "earlier this year i was helping a small clinic that complained about \u201ctoo much paperwork\u201d and how it was slowing everything down. they thought they needed some fancy ai system. they didn\u2019t. so instead of jumping straight into code, i hopped on a call with them for a few hours and watched what they actually did every day. turned out half their \u201cdata entry\u201d was literally just copy-pasting the same info between forms, spreadsheets, and emails. i built a simple workflow that: * reads their intake forms * fills out their spreadsheet automatically * sends a summary email to the right staff * stores a copy in their shared folder no fancy dashboards or complicated software to learn. just connected what they were already using. two weeks later, they told me it cut 10\u201312 hours of admin work a week. that\u2019s roughly \\~$30k a year in saved time (i believe). the lesson for me: most businesses don\u2019t need complicated systems, they just need less friction. if you want to build automations that people actually use, start by watching what they already do instead of what they say they do.",
+        "source": "reddit/automation",
+        "date": "2025-12-02",
+        "suggested_tech": "iOS",
+        "author_name": "Warm_Abalone_9602",
+        "author_id": "h0tiw30d",
+        "reference_link": "https://reddit.com/r/automation/comments/1pbticx/accidentally_saved_a_client_30k_a_year_just_by/",
+        "tags": []
+    },
+    {
+        "ps_id": 10,
+        "title": "flicker - automates vintage bookshop weekends with make and bookmanager",
+        "description": "i just conjured a dusty, beautiful automation for a tiny second-hand bookshop owner in p\u00e9cs who was drowning every friday afternoon. new boxes of donated books arrived, weekend browsers tripled, instagram had to be fed, and the cat still needed feeding, all while the till rang non-stop. so i created flicker, an automation that smells like old paper and coffee, turning the glorious weekend chaos into quiet, profitable poetry. flicker uses make as the silent bookseller and bookmanager (the simple system most hungarian antiquarian shops use) to keep the shelves singing. it\u2019s gentle, nostalgic, and runs like a well-loved novel. here\u2019s how flicker turns pages: 1. every new donation box is photographed with a phone \u2192 make instantly reads titles via google lens, adds them to bookmanager, and prices them using the shop\u2019s secret formula. 2. friday 16:00 it picks the 12 most beautiful new arrivals, creates a dreamy instagram carousel (\u201cweekend treasures just landed\u201d), and schedules it for saturday 10:00. 3. when a book sells, make texts the owner one line: \u201c1952 m\u00f3ra ferenc first edition just found its new home \u2013 9 800 ft in the till.\u201d 4. sunday 18:00 it posts a single story: \u201cthank you for another weekend of stories. these 7 books are still waiting for you\u2026\u201d with atmospheric shelf photos. 5. monday morning the owner wakes up to one slack message: \u201cweekend total 187 400 ft, 43 books rehomed, cat fed, soul happy. coffee\u2019s on the counter.\u201d this setup is pure love for antiquarian booksellers, tiny vintage shops, or anyone selling pieces of history. it turns weekend overwhelm into a gentle, magical rhythm where the books do most of the talking. happy automating, and may your pages always turn gently.",
+        "source": "reddit/automation",
+        "date": "2025-12-02",
+        "suggested_tech": "Flask, Android, JS, iOS, AI",
+        "author_name": "Due-Way-7959",
+        "author_id": "1whkrpkzqj",
+        "reference_link": "https://reddit.com/r/automation/comments/1pblmuw/flicker_automates_vintage_bookshop_weekends_with/",
+        "tags": []
+    },
+    {
+        "ps_id": 11,
+        "title": "automating cold email without it turning into spam (what actually worked for me)",
+        "description": "i see a lot of people asking how to automate cold outreach, so i wanted to share what actually worked for me after a bunch of trial and error. automation helps a ton, but only for the boring parts. the moment you try to automate thinking, your results fall off a cliff. what i automated: * list enrichment + cleanup * sending schedules (slow ramp, business hours, random gaps) * followups if no reply * inbox rotation once volume increased what i did not automate: * who i target * the first line of the email * when to stop a sequence the biggest lesson for me: deliverability > automation logic. i broke a domain early by scaling too fast with a \u201cperfect\u201d workflow. everything ran smoothly\u2026 straight into spam. now i treat automation like infrastructure, not magic: * start tiny (10-20 emails/day/inbox) * warm domains properly before scaling * cap volume per inbox * kill sequences early if bounces or complaints show up my current stack is pretty simple: * automation tool for sequencing + inbox rotation * clean data source * one workflow that i tweak, not rebuild every week when i needed to scale past a few inboxes, the biggest pain wasn\u2019t workflows, it was managing warm-up and sender reputation across domains. at that point i stopped diy-ing that part and used a tool with a built-in warm-up pool so i could focus on copy and targeting instead of babysitting dns and inbox health. curious how other people here balance automation vs manual control. what part of your outreach do you refuse to automate?",
+        "source": "reddit/automation",
+        "date": "2025-12-01",
+        "suggested_tech": "iOS, JS, React, Android",
+        "author_name": "No-Dig-9252",
+        "author_id": "18exazwu8x",
+        "reference_link": "https://reddit.com/r/automation/comments/1pbebsg/automating_cold_email_without_it_turning_into/",
+        "tags": []
+    },
+    {
+        "ps_id": 12,
+        "title": "data scrape + social media post generator",
+        "description": "hey everyone hope i\u2019m posting at the right place. i\u2019m been following the whole automation + ai agents + n8n platform etc topic for a while and find it very fascinating on what it can do for individual and business level. i always want to implement a so call a smart ai tool where it helps my team scrape (hopefully that\u2019s the right term to use here) specific information and data on a daily basis on investment/lending topic than post on social media platform like ig, fb, linkedin and so on. i tried vibe coding myself on an app but the content is completely useless. i\u2019ve read many users have done a proper set up on n8n but i\u2019m not techy enough to do it myself. i\u2019m wondering if anyone can guide me through here if there is a better way to approach this\u2026. or if you have experience and had built one of these and can help me at a reasonable cost. please let me know.",
+        "source": "reddit/automation",
+        "date": "2025-12-01",
+        "suggested_tech": "AI",
+        "author_name": "walrus_yu",
+        "author_id": "pbpme",
+        "reference_link": "https://reddit.com/r/automation/comments/1paswb9/data_scrape_social_media_post_generator/",
+        "tags": []
+    },
+    {
+        "ps_id": 13,
+        "title": "glint - automates micro-bakery morning magic with make and square",
+        "description": "i just baked a golden automation for a one-woman micro-bakery in budapest who was waking at 3 am already exhausted from yesterday\u2019s orders. hand-writing tomorrow\u2019s sourdough menu on the chalkboard, texting regulars at dawn, juggling dms for special requests, and praying the butter delivery arrives on time was turning her love for bread into sleepless dread. so i created glint, an automation that works while she sleeps, so the moment she opens the oven at 4 am the whole day already smells like fresh kov\u00e1szos keny\u00e9r and calm. glint uses make as the night-shift baker and square (her simple pos) to run the entire morning like clockwork. it\u2019s warm, quiet, and runs on flour-dusted autopilot. here\u2019s how glint rises: 1. every evening at 20:00, make counts tomorrow\u2019s pre-orders from square, instagram dms, and a tiny google form, then texts the flour supplier the exact kilo amount needed. 2. at 22:00 it auto-posts tomorrow\u2019s menu to instagram stories with mouth-watering photos taken the day before and a \u201csold out = sold out\u201d disclaimer. 3. at 05:30 it sends one group sms to the regulars\u2019 list: \u201cfresh from the oven: 18 sesame, 12 walnut-raisin, 5 olive. door opens 07:00. first come, first served.\u201d 4. when the first customer pays with card, square instantly prints a numbered ticket and pings the baker\u2019s watch: \u201ccustomer #1 is here, smile ready.\u201d 5. at 10:00 when everything is sold out, glint posts a single instagram story \u201csold out \u2013 see you tomorrow \u2661\u201d and texts the baker: \u201cyou made 112 400 ft before coffee. go take a nap.\u201d this setup is pure morning poetry for micro-bakeries, home bakers, or anyone selling small-batch love before sunrise. it turns 3 am panic into peaceful, profitable ritual and lets the baker do what she was born to do: bake and smile. happy automating, and may your dough always rise perfectly.",
+        "source": "reddit/automation",
+        "date": "2025-12-01",
+        "suggested_tech": "iOS, JS, AI, Android",
+        "author_name": "Due-Way-7959",
+        "author_id": "1whkrpkzqj",
+        "reference_link": "https://reddit.com/r/automation/comments/1paqdkb/glint_automates_microbakery_morning_magic_with/",
+        "tags": []
+    },
+    {
+        "ps_id": 14,
+        "title": "smart cookware to prepare spaghetti and the like",
+        "description": "lots of dishes have the same method of preparation: 1) pour water into a pot 2) wait till it boils 3) add pasta/damplings/etc 4) wait a set amount of time 5) turn the heat off and strain water off. unfortunately, steps 2,3 and 5 require extra attention from the cook. it would be nice if steps 2, 3, 4 and 5 could be automated and integrated in one smart pot, so that cooking such dishes don't require any additional attention aside from the initial ones. so i'd like a cookware that: 1) can detect that the water inside is boiling 2) can put in ingredients (from some separate storage) 3) waits for them to boil for a set amount of time 4) strains the water through a pipe afterward",
+        "source": "reddit/SomebodyMakeThis",
+        "date": "2025-11-21",
+        "suggested_tech": "JS, AI",
+        "author_name": "Ateist",
+        "author_id": "3d1y3",
+        "reference_link": "https://reddit.com/r/SomebodyMakeThis/comments/1p2wqxu/smart_cookware_to_prepare_spaghetti_and_the_like/",
+        "tags": [
+            "Physical Product"
+        ]
+    },
+    {
+        "ps_id": 15,
+        "title": "i built an ai automation that clones competitor facebook video ads shot-by-shot and spins them for your brand with sora 2 / gemini / claude / n8n",
+        "description": "i built an ai workflow that analyzes competitor video ads shot-by-shot and recreates the same concept for your brand using sora 2. to run it, you can upload any competitor's video ad (from the facebook / meta ads library) and the automation will analyze it frame by frame and generate an video inspired by what's already working in your niche. it is set up to scrape, build, and use a brand guidelines document so the script writing process and messaging keeps the new video on-brand. here\u2019s a demo of the automation\u2019s input / output for the deodorant brand \u201cnative\u201d where it clones and spins an ad from dr. squatch (their competitor): ## here's how the full automation works ### 1. generate brand guidelines the part of this system scrapes a brand's website and combines all that information together into a well-formatted brand guidelines doc. - start with firecrawl to scrape the rand website and pull relevant pages about your brand, products, and messaging - analyzes the scraped content with gemini 2.5 pro to synthesize a brand guidelines document - saves the formatted guidelines to google drive as a well-structured document with proper headings and sections ### 2. analyze the provided competitor video ad the core video cloning section reverse-engineers any competitor ad: - upload the competitor video you want to clone. this can be sourced from the meta / facebook ads library pretty easily - use the gemini 2.5 pro \u201cvideo understanding api\u201d to analyze the video frame by frame - gemini breaks down each shot with detailed descriptions including camera angles, product placement, dialogue, and visual elements so we have an exact idea what is happening - generate a structured shot list that captures the narrative flow and production techniques ### 3. write the new video ad script and follow sora 2 prompting guidelines now that we have both some of the context captured for our brand guidelines and the analysis of the competitor ad video, it's time to go forward actually writing the script for our video ad. - claude sonnet takes the competitor's shot breakdown, your brand guidelines, and sora 2 prompting best practices analyzes how to best write a prompt for sora 2 - claude also genereates a new script that maintains the winning structure of the original ad but adapts it for your brand/product ### 4. generate the video with sora 2 final steps and nodes in this workflow are responsible for working with the score to api and then actually getting your video downloaded - first it calls the sora 2 ap with our prompt generated by claude and the product reference image uploaded into the form trigger - the workflow follows a polling system to check on video gen progress since it will take 1 minute or more - finally we download our video result from the `/content` endpoint and save that video file into google drive ## workflow link + other resources - youtube video that walks through this workflow step-by-step: - the full n8n workflow, which you can copy and paste directly into your instance, is on github here:",
+        "source": "reddit/Automate",
+        "date": "2025-11-21",
+        "suggested_tech": "AI, Machine Learning, Android, Cloud, iOS",
+        "author_name": "dudeson55",
+        "author_id": "6wm68",
+        "reference_link": "https://reddit.com/r/Automate/comments/1p357fq/i_built_an_ai_automation_that_clones_competitor/",
+        "tags": []
+    },
+    {
+        "ps_id": 16,
+        "title": "how to create your own ai agent with n8n.",
+        "description": "",
+        "source": "reddit/Automate",
+        "date": "2025-11-12",
+        "suggested_tech": "AI",
+        "author_name": "NickyB808",
+        "author_id": "1t79i7leqd",
+        "reference_link": "https://reddit.com/r/Automate/comments/1ovayka/how_to_create_your_own_ai_agent_with_n8n/",
+        "tags": []
+    }
+]
