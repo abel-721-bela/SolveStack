@@ -61,6 +61,11 @@ class Problem(Base):
     tags = Column(JSON)  # Array of tags from source
     scraped_at = Column(DateTime, default=datetime.utcnow)
     
+    # Phase 4: Multi-Source Ingestion Fields
+    source_id = Column(String(255), nullable=True, index=True)  # External platform ID (e.g., Reddit post ID, SO question ID)
+    humanized_explanation = Column(Text, nullable=True)  # 2-3 simple English sentences explaining the problem
+    solution_possibility = Column(String(50), nullable=True)  # "software" | "hardware" | "hybrid"
+    
     # Relationships
     interested_users = relationship(
         'User', 
@@ -76,6 +81,11 @@ class Problem(Base):
     upvotes = Column(Integer, default=0)  # Community engagement (simulated)
     views = Column(Integer, default=0)  # Problem views (simulated)
     score_updated_at = Column(DateTime, nullable=True)  # Last scoring timestamp
+    
+    # Composite index for de-duplication
+    __table_args__ = (
+        Index('idx_source_source_id', 'source', 'source_id'),
+    )
     
     def __repr__(self):
         return f"<Problem(ps_id={self.ps_id}, title='{self.title[:50]}...', source='{self.source}')>"

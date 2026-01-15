@@ -55,6 +55,11 @@ class ProblemResponse(ProblemBase):
     scraped_at: datetime
     interested_count: int = 0  # Will be computed
     
+    # Phase 4: Multi-Source Fields (optional for backward compatibility)
+    source_id: Optional[str] = None
+    humanized_explanation: Optional[str] = None
+    solution_possibility: Optional[str] = None
+    
     class Config:
         from_attributes = True
 
@@ -131,6 +136,15 @@ class ScrapeResponse(BaseModel):
     total_scraped: int
     reddit_count: int = 0
     github_count: int = 0
+
+class ScrapeAllResponse(BaseModel):
+    """Schema for unified /scrape/all endpoint response"""
+    message: str
+    total_scraped: int
+    github_count: int = 0
+    stackoverflow_count: int = 0
+    hackernews_count: int = 0
+    duplicates_skipped: int = 0
 
 # ============ Phase 2C: Quality Scoring & Matching Schemas ============
 

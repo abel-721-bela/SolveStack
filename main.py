@@ -14,7 +14,7 @@ from schemas import (
     InterestRequest, InterestResponse,
     CollaborationRequestCreate, CollaborationActionRequest,
     CollaborationRequestResponse, CollaborationStatusResponse, CollaborationGroupInfo,
-    ScrapeRequest, ScrapeResponse,
+    ScrapeRequest, ScrapeResponse, ScrapeAllResponse,
     QualityScoreResponse, RecommendationsResponse, CollaborationSuggestionsResponse
 )
 from auth import (
@@ -235,6 +235,274 @@ def trigger_scrape(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Scraping failed: {str(e)}"
         )
+
+
+@app.post("/scrape/all", response_model=ScrapeAllResponse, tags=["Admin"])
+def scrape_all_sources(db: Session = Depends(get_db)):
+    """
+    Unified scraper: Fetch problems from all sources (GitHub, Stack Overflow, Hacker News).
+    
+    Behavior:
+    - TARGET: 30 total problems per run
+    - Quota redistribution: If one platform returns fewer results, redistributes to others
+    - Continues fetching until quota met or all sources exhausted
+    - De-duplicates based on:
+      1. reference_link (unique constraint)
+      2. source + source_id combination
+      3. Title similarity within same source (>85% match)
+    
+    Returns:
+        Counts of problems scraped from each source and duplicates skipped
+    """
+    from scrapers import scrape_github, scrape_stackoverflow, scrape_hackernews
+    from sqlalchemy.exc import IntegrityError
+    from difflib import SequenceMatcher
+    
+    def is_similar_title(title1: str, title2: str, threshold: float = 0.85) -> bool:
+        """Check if two titles are similar using fuzzy matching"""
+        ratio = SequenceMatcher(None, title1.lower(), title2.lower()).ratio()
+        return ratio >= threshold
+    
+    def is_duplicate(problem_data: dict, db: Session) -> bool:
+        """
+        Check if problem is a duplicate using multiple strategies.
+        Returns True if duplicate, False if unique.
+        """
+        # Strategy 1: Check reference_link
+        existing_link = db.query(Problem).filter(
+            Problem.reference_link == problem_data['reference_link']
+        ).first()
+        
+        if existing_link:
+            return True
+        
+        # Strategy 2: Check source + source_id combination
+        if problem_data.get('source_id'):
+            existing_source_id = db.query(Problem).filter(
+                Problem.source == problem_data['source'],
+                Problem.source_id == problem_data['source_id']
+            ).first()
+            
+            if existing_source_id:
+                return True
+        
+        # Strategy 3: Check title similarity within same source
+        source_prefix = problem_data['source'].split('/')[0]
+        similar_problems = db.query(Problem).filter(
+            Problem.source.like(f"{source_prefix}%")
+        ).order_by(Problem.scraped_at.desc()).limit(500).all()
+        
+        for existing_problem in similar_problems:
+            if is_similar_title(problem_data['title'], existing_problem.title):
+                return True
+        
+        return False
+    
+    def insert_problems(problems_list: list, db: Session) -> tuple:
+        """Insert problems into database, return (inserted_count, duplicates_skipped)"""
+        inserted = 0
+        duplicates = 0
+        
+        for problem_data in problems_list:
+            if is_duplicate(problem_data, db):
+                duplicates += 1
+                continue
+            
+            try:
+                new_problem = Problem(
+                    title=problem_data['title'],
+                    description=problem_data['description'],
+                    source=problem_data['source'],
+                    date=problem_data['date'],
+                    suggested_tech=problem_data['suggested_tech'],
+                    author_name=problem_data['author_name'],
+                    author_id=problem_data['author_id'],
+                    reference_link=problem_data['reference_link'],
+                    tags=problem_data['tags'],
+                    source_id=problem_data.get('source_id'),
+                    humanized_explanation=problem_data.get('humanized_explanation'),
+                    solution_possibility=problem_data.get('solution_possibility')
+                )
+                
+                db.add(new_problem)
+                db.commit()
+                inserted += 1
+            except IntegrityError:
+                db.rollback()
+                duplicates += 1
+            except Exception as e:
+                print(f"  ❌ Error inserting problem: {e}")
+                db.rollback()
+        
+        return inserted, duplicates
+    
+    # QUOTA ENFORCEMENT CONSTANTS
+    TARGET_TOTAL = 30
+    INITIAL_PER_SOURCE = 10
+    
+    github_count = 0
+    stackoverflow_count = 0
+    hackernews_count = 0
+    total_duplicates = 0
+    
+    github_fetched = 0
+    stackoverflow_fetched = 0
+    hackernews_fetched = 0
+    
+    try:
+        print("\n" + "=" * 70)
+        print("🚀 MULTI-SOURCE SCRAPING WITH QUOTA ENFORCEMENT")
+        print("=" * 70)
+        print(f"🎯 TARGET: {TARGET_TOTAL} total problems")
+        print(f"📊 STRATEGY: {INITIAL_PER_SOURCE} per source, redistribute if needed")
+        print("=" * 70)
+        
+        # PHASE 1: Initial scraping (10 from each source)
+        print(f"\n📥 PHASE 1: Initial Scraping ({INITIAL_PER_SOURCE} per source)")
+        print("-" * 70)
+        
+        # Scrape GitHub
+        print(f"\n[1/3] GitHub...")
+        try:
+            github_problems = scrape_github(limit=INITIAL_PER_SOURCE)
+            github_fetched = len(github_problems)
+            github_count, github_dups = insert_problems(github_problems, db)
+            total_duplicates += github_dups
+            print(f"  ✅ GitHub: {github_count} inserted, {github_dups} duplicates")
+        except Exception as e:
+            print(f"  ❌ GitHub scraping failed: {str(e)[:100]}")
+            github_problems = []
+        
+        # Scrape Stack Overflow
+        print(f"\n[2/3] Stack Overflow...")
+        try:
+            stackoverflow_problems = scrape_stackoverflow(limit=INITIAL_PER_SOURCE)
+            stackoverflow_fetched = len(stackoverflow_problems)
+            stackoverflow_count, so_dups = insert_problems(stackoverflow_problems, db)
+            total_duplicates += so_dups
+            print(f"  ✅ Stack Overflow: {stackoverflow_count} inserted, {so_dups} duplicates")
+        except Exception as e:
+            print(f"  ❌ Stack Overflow scraping failed: {str(e)[:100]}")
+            stackoverflow_problems = []
+        
+        # Scrape Hacker News
+        print(f"\n[3/3] Hacker News...")
+        try:
+            hackernews_problems = scrape_hackernews(limit=INITIAL_PER_SOURCE)
+            hackernews_fetched = len(hackernews_problems)
+            hackernews_count, hn_dups = insert_problems(hackernews_problems, db)
+            total_duplicates += hn_dups
+            print(f"  ✅ Hacker News: {hackernews_count} inserted, {hn_dups} duplicates")
+        except Exception as e:
+            print(f"  ❌ Hacker News scraping failed: {str(e)[:100]}")
+            hackernews_problems = []
+        
+        # Calculate current total
+        current_total = github_count + stackoverflow_count + hackernews_count
+        
+        print(f"\n📊 Phase 1 Complete: {current_total}/{TARGET_TOTAL} problems added")
+        
+        # PHASE 2: Quota Redistribution (if needed)
+        if current_total < TARGET_TOTAL:
+            shortage = TARGET_TOTAL - current_total
+            print(f"\n📈 PHASE 2: Quota Redistribution")
+            print(f"  Shortage: {shortage} problems")
+            print(f"  Redistributing to all sources...")
+            print("-" * 70)
+            
+            # Try to fill quota by fetching more from each source
+            attempts = 0
+            max_attempts = 3  # Prevent infinite loops
+            
+            while current_total < TARGET_TOTAL and attempts < max_attempts:
+                attempts += 1
+                additional_per_source = max(5, (shortage // 3) + 1)
+                
+                print(f"\n  Attempt {attempts}: Fetching {additional_per_source} more from each source...")
+                
+                # Additional GitHub
+                if current_total < TARGET_TOTAL:
+                    try:
+                        extra_github = scrape_github(limit=additional_per_source)
+                        if extra_github:
+                            extra_count, extra_dups = insert_problems(extra_github, db)
+                            github_count += extra_count
+                            github_fetched += len(extra_github)
+                            total_duplicates += extra_dups
+                            current_total += extra_count
+                            print(f"    GitHub: +{extra_count} ({extra_dups} dups)")
+                    except:
+                        pass
+                
+                # Additional Stack Overflow
+                if current_total < TARGET_TOTAL:
+                    try:
+                        extra_so = scrape_stackoverflow(limit=additional_per_source)
+                        if extra_so:
+                            extra_count, extra_dups = insert_problems(extra_so, db)
+                            stackoverflow_count += extra_count
+                            stackoverflow_fetched += len(extra_so)
+                            total_duplicates += extra_dups
+                            current_total += extra_count
+                            print(f"    Stack Overflow: +{extra_count} ({extra_dups} dups)")
+                    except:
+                        pass
+                
+                # Additional Hacker News
+                if current_total < TARGET_TOTAL:
+                    try:
+                        extra_hn = scrape_hackernews(limit=additional_per_source)
+                        if extra_hn:
+                            extra_count, extra_dups = insert_problems(extra_hn, db)
+                            hackernews_count += extra_count
+                            hackernews_fetched += len(extra_hn)
+                            total_duplicates += extra_dups
+                            current_total += extra_count
+                            print(f"    Hacker News: +{extra_count} ({extra_dups} dups)")
+                    except:
+                        pass
+                
+                shortage = TARGET_TOTAL - current_total
+                if shortage <= 0:
+                    break
+        
+        # FINAL SUMMARY
+        print(f"\n" + "=" * 70)
+        print(f"✅ SCRAPING COMPLETE")
+        print("=" * 70)
+        print(f"\n📊 TOTALS:")
+        print(f"  Problems Added: {current_total}/{TARGET_TOTAL} ({(current_total/TARGET_TOTAL*100):.1f}%)")
+        print(f"  Total Fetched: {github_fetched + stackoverflow_fetched + hackernews_fetched}")
+        print(f"  Duplicates Skipped: {total_duplicates}")
+        
+        print(f"\n📈 BY SOURCE:")
+        print(f"  GitHub:         {github_count:>3} added ({github_fetched} fetched)")
+        print(f"  Stack Overflow: {stackoverflow_count:>3} added ({stackoverflow_fetched} fetched)")
+        print(f"  Hacker News:    {hackernews_count:>3} added ({hackernews_fetched} fetched)")
+        print("=" * 70 + "\n")
+        
+        return {
+            "message": f"Successfully scraped {current_total} new problems ({total_duplicates} duplicates skipped)",
+            "total_scraped": current_total,
+            "total_fetched": github_fetched + stackoverflow_fetched + hackernews_fetched,
+            "github_count": github_count,
+            "github_fetched": github_fetched,
+            "stackoverflow_count": stackoverflow_count,
+            "stackoverflow_fetched": stackoverflow_fetched,
+            "hackernews_count": hackernews_count,
+            "hackernews_fetched": hackernews_fetched,
+            "duplicates_skipped": total_duplicates,
+            "target_per_source": INITIAL_PER_SOURCE,
+            "target_total": TARGET_TOTAL
+        }
+    
+    except Exception as e:
+        print(f"\n❌ CRITICAL ERROR: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Multi-source scraping failed: {str(e)}"
+        )
+
 
 
 # ============ Interest & Collaboration Endpoints ============

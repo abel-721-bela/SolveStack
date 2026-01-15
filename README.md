@@ -1,202 +1,306 @@
-# SolveStack - Crowdsourced Tech Problems Platform
+# SolveStack - Real-World Problem Discovery Platform
 
-A platform that crowdsources real-world tech problems from Reddit, GitHub, and other platforms, turning them into structured project ideas for developers to collaborate on.
+[![Python](https://img.shields.io/badge/Python-3.9%2B-blue)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.109%2B-green)](https://fastapi.tiangolo.com/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15%2B-blue)](https://www.postgresql.org/)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-## 🚀 Quick Start
+## 📋 Project Overview
+
+**SolveStack** is an intelligent platform for discovering, curating, and collaborating on real-world technical problems from multiple sources including Reddit, Stack Overflow, Hacker News, and GitHub. It uses AI-powered classification to help developers, researchers, and teams find meaningful problems to solve.
+
+### Key Features
+- 🔍 **Multi-Platform Scraping**: Automated discovery from 4+ sources
+- 🤖 **AI-Powered Classification**: Difficulty scoring and solution possibility analysis
+- 👥 **Team Collaboration**: Real-time chat, voting, and problem discussions
+- 🔐 **Secure Authentication**: JWT-based auth with role management
+- 📊 **Smart Filtering**: De-duplication, quality scoring, and intelligent categorization
+- 🗄️ **Production-Ready**: PostgreSQL + Alembic migrations for schema versioning
+
+---
+
+## 🚀 Quick Start for Teammates
 
 ### Prerequisites
-- Python 3.9+
-- PostgreSQL (or SQLite for testing)
-- Node.js 16+ (for frontend)
+- **Python 3.9+** installed
+- **PostgreSQL 15+** installed and running
+- **Git** installed
+- API credentials for scraping sources (see Environment Setup)
 
-### Backend Setup
-
-1. **Create environment file**
-   ```bash
-   # Copy the example and fill in your values
-   copy .env.example .env
-   ```
-   
-   Required values in `.env`:
-   - `REDDIT_CLIENT_ID`, `REDDIT_CLIENT_SECRET`, `REDDIT_USER_AGENT` (already filled)
-   - `DATABASE_URL` (PostgreSQL or SQLite)
-   - `SECRET_KEY` (generate a random string for JWT)
-
-2. **Install dependencies**
-   ```bash
-   # Activate virtual environment
-   venv\Scripts\activate
-   
-   # Install Python packages
-   pip install -r requirements.txt
-   ```
-
-3. **Run database migration** (if you have existing SQLite data)
-   ```bash
-   python migrate_data.py
-   ```
-
-4. **Start the API server**
-   ```bash
-   uvicorn main:app --reload
-   ```
-   
-   API will be available at: http://localhost:8000
-   Interactive API docs: http://localhost:8000/docs
-
-### Frontend Setup
-
+### Step 1: Clone the Repository
 ```bash
-cd problem-shelf-frontend
-npm install
-npm start
+git clone <repository-url>
+cd major-proj-demo
 ```
 
-Frontend will be available at: http://localhost:3000
+### Step 2: Set Up Python Environment
+```bash
+# Create virtual environment
+python -m venv venv
+
+# Activate virtual environment
+# On Windows:
+venv\\Scripts\\activate
+# On macOS/Linux:
+source venv/bin/activate
+
+# Install dependencies
+pip install -r requirements.txt
+```
+
+### Step 3: Configure PostgreSQL Database
+```bash
+# Open PostgreSQL command line
+psql -U postgres
+
+# Create database
+CREATE DATABASE solvestack;
+
+# Exit PostgreSQL
+\\q
+```
+
+### Step 4: Configure Environment Variables
+```bash
+# Copy example environment file
+cp .env.example .env
+
+# Edit .env with your credentials
+# See "Environment Variables" section below
+```
+
+### Step 5: Run Database Migrations
+```bash
+# Initialize Alembic (if needed)
+alembic upgrade head
+```
+
+### Step 6: Run the Application
+```bash
+# Start the FastAPI server
+uvicorn main:app --reload
+
+# Server will be available at:
+# http://127.0.0.1:8000
+# API docs at: http://127.0.0.1:8000/docs
+```
+
+---
+
+## 🔧 Environment Variables
+
+Copy `.env.example` to `.env` and configure the following:
+
+### Required Variables
+```bash
+# Database
+DATABASE_URL=postgresql://postgres:your_password@localhost:5432/solvestack
+
+# JWT Authentication
+SECRET_KEY=<generate with: python -c "import secrets; print(secrets.token_urlsafe(32))">
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=120
+```
+
+### API Credentials (for scraping)
+```bash
+# Reddit API (https://www.reddit.com/prefs/apps)
+REDDIT_CLIENT_ID=your_reddit_client_id
+REDDIT_CLIENT_SECRET=your_reddit_client_secret
+REDDIT_USER_AGENT=platform:YourAppName:1.0 (by /u/YourUsername)
+
+# Stack Overflow (https://stackapps.com/apps/oauth/register)
+STACKEXCHANGE_KEY=your_stackexchange_key
+
+# GitHub Token (https://github.com/settings/tokens)
+GITHUB_TOKEN=your_github_token  # Optional but recommended
+```
+
+### Optional Variables
+```bash
+# Stripe (for payments)
+STRIPE_SECRET_KEY=your_stripe_key
+STRIPE_PUBLISHABLE_KEY=your_publishable_key
+STRIPE_PRICE_ID=your_price_id
+
+# Firebase (for real-time chat)
+FIREBASE_CREDENTIALS_PATH=path/to/firebase-credentials.json
+```
 
 ---
 
 ## 📁 Project Structure
 
 ```
-d:/major proj demo/
-├── main.py                 # FastAPI application
-├── models.py              # SQLAlchemy ORM models
-├── database.py            # Database connection
-├── schemas.py             # Pydantic schemas for validation
-├── auth.py                # JWT authentication
-├── pyproblem_shelf.py     # Scraping logic (Reddit + GitHub)
-├── migrate_data.py        # SQLite to PostgreSQL migration
-├── requirements.txt       # Python dependencies
-├── .env                   # Environment variables (create this!)
-├── .env.example           # Environment template
-├── BACKEND_SETUP.md       # Detailed backend guide
+major-proj-demo/
+├── main.py                   # FastAPI application entry point
+├── models.py                 # SQLAlchemy database models
+├── schemas.py                # Pydantic schemas for validation
+├── database.py               # Database connection & session management
+├── auth.py                   # JWT authentication logic
+├── scoring_engine.py         # AI-powered problem classification
 │
-└── problem-shelf-frontend/  # React frontend
-    ├── src/
-    │   ├── pages/         # Dashboard, Suggest, Admin
-    │   └── components/    # ProblemCard, Navbar, etc.
-    └── package.json
+├── scrapers/                 # Multi-platform scraping modules
+│   ├── __init__.py
+│   ├── reddit_scraper.py
+│   ├── stackoverflow_scraper.py
+│   ├── hackernews_scraper.py
+│   └── github_scraper.py
+│
+├── alembic/                  # Database migrations
+│   ├── versions/             # Migration scripts
+│   ├── env.py
+│   └── alembic.ini
+│
+├── tests/                    # Test scripts
+│   ├── test_backend.py
+│   ├── test_scrapers.py
+│   ├── test_scrape_all_endpoint.py
+│   └── ...
+│
+├── docs/                     # Documentation
+│   ├── PROJECT_STATUS.md
+│   ├── TESTING_GUIDE.md
+│   └── ...
+│
+├── .env.example              # Environment template
+├── .gitignore                # Git ignore rules
+└── requirements.txt          # Python dependencies
 ```
 
 ---
 
-## 🔑 Features
+## 🧪 Running Tests
 
-### Implemented ✅
-- **Multi-platform scraping**: Reddit + GitHub Issues
-- **AI classification**: Zero-shot NLP to filter tech-solvable problems
-- **FastAPI backend**: RESTful API with automatic docs
-- **User authentication**: JWT-based auth with bcrypt passwords
-- **Interest tracking**: Users can mark interest in problems
-- **Database**: PostgreSQL with SQLAlchemy ORM
-- **Duplicate detection**: Unique constraint on reference links
-- **React frontend**: Material-UI dashboard
-
-### In Progress 🚧
-- **Collaboration rooms**: Premium users can chat and share files
-- **Stripe integration**: Freemium monetization model
-- **Deployment**: Render (backend) + Vercel (frontend)
-
----
-
-## 🛠️ API Endpoints
-
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| GET | `/` | Health check | No |
-| POST | `/register` | Register new user | No |
-| POST | `/login` | Login and get JWT token | No |
-| GET | `/me` | Get current user info | Yes |
-| GET | `/problems` | List all problems | No |
-| GET | `/problems/{id}` | Get problem details | No |
-| POST | `/scrape` | Trigger scraping | No (will add admin auth) |
-| POST | `/interest` | Mark interest in problem | Yes |
-| DELETE | `/interest/{id}` | Remove interest | Yes |
-| POST | `/collaborate/request` | Join collaboration room | Yes (Premium) |
-
----
-
-## 🧪 Testing
-
-### Test API Endpoints
-
-**1. Register a user:**
+### Test Individual Scrapers
 ```bash
-curl -X POST http://localhost:8000/register \
-  -H "Content-Type: application/json" \
-  -d "{\"email\":\"test@example.com\",\"username\":\"testuser\",\"password\":\"password123\"}"
+python test_individual_scrapers.py
 ```
 
-**2. Login:**
+### Test Scrape All Endpoint
 ```bash
-curl -X POST http://localhost:8000/login \
-  -F "username=test@example.com" \
-  -F "password=password123"
+python test_scrape_all_endpoint.py
 ```
 
-**3. Get problems:**
+### Test Backend API
 ```bash
-curl http://localhost:8000/problems
+python test_backend.py
 ```
 
-**Or use the interactive API docs:**
-http://localhost:8000/docs
+### Test Database Connection
+```bash
+python test_pg_connection.py
+```
+
+### Verify Database Schema
+```bash
+python verify_db.py
+```
 
 ---
 
-## 📊 Database Schema
+## 🛠️ Development Workflow
 
-### Users
-- `id`: Primary key
-- `email`: Unique email
-- `username`: Unique username
-- `hashed_password`: Bcrypt hash
-- `is_premium`: Boolean (free vs paid)
-- `created_at`: Timestamp
+### Creating New Database Migrations
+```bash
+# After modifying models.py
+alembic revision --autogenerate -m "Description of changes"
+
+# Review the generated migration file in alembic/versions/
+
+# Apply migration
+alembic upgrade head
+```
+
+### Scraping Problems
+```bash
+# Scrape from all sources (30 problems per run)
+curl -X POST http://127.0.0.1:8000/scrape/all
+
+# Check logs for details on fetched/inserted/skipped problems
+```
+
+### Adding Sample Data
+```bash
+python add_sample_problems.py
+```
+
+---
+
+## 📊 API Endpoints
+
+### Authentication
+- `POST /register` - Create new user account
+- `POST /token` - Login and get JWT token
 
 ### Problems
-- `ps_id`: Primary key
-- `title`: Problem title
-- `description`: Full description
-- `source`: Platform (reddit/subreddit, github/repo)
-- `suggested_tech`: AI-suggested tech stack
-- `reference_link`: Unique source URL
-- `tags`: JSON array of tags
-- `scraped_at`: Timestamp
+- `GET /problems` - List all problems (with filters)
+- `GET /problems/{id}` - Get specific problem
+- `POST /scrape/all` - Trigger scraping from all sources
 
-### Many-to-Many: Users ↔ Problems (interests)
+### Collaboration
+- `POST /problems/{id}/vote` - Upvote/downvote problem
+- `POST /problems/{id}/claim` - Claim problem for solving
+- `GET /problems/{id}/collaborators` - List collaborators
 
----
+### Admin
+- `GET /db/info` - Database statistics
 
-## 🚢 Deployment
-
-### Backend (Render)
-1. Create PostgreSQL database on Render
-2. Add environment variables
-3. Deploy from GitHub repo
-4. Run: `uvicorn main:app --host 0.0.0.0 --port $PORT`
-
-### Frontend (Vercel)
-1. Import GitHub repo
-2. Set build command: `npm run build`
-3. Set output directory: `build`
-4. Add environment variable `REACT_APP_API_URL`
+Full API documentation available at: `http://127.0.0.1:8000/docs`
 
 ---
 
-## 📝 License
+## 📖 Additional Documentation
 
-MIT License - feel free to use this project!
+- **[PROJECT_STATUS.md](docs/PROJECT_STATUS.md)** - Current development status and roadmap
+- **[TESTING_GUIDE.md](TESTING_GUIDE.md)** - Comprehensive testing instructions
+- **[PHASE3_1_MIGRATION.md](PHASE3_1_MIGRATION.md)** - Database migration guide
+- **[COLLABORATION_TESTING.md](COLLABORATION_TESTING.md)** - Team collaboration features
 
 ---
 
 ## 🤝 Contributing
 
-This is a university project for S8 presentation. Not currently accepting external contributions.
+1. Create a new branch: `git checkout -b feature/your-feature`
+2. Make your changes and test thoroughly
+3. Run linting: `black . && flake8`
+4. Commit: `git commit -m "Add your feature"`
+5. Push: `git push origin feature/your-feature`
+6. Create Pull Request
 
 ---
 
-## 📧 Contact
+## 🐛 Troubleshooting
 
-For questions about this project, contact the development team.
+### "This site can't be reached" error
+- Ensure uvicorn is running: `uvicorn main:app --reload`
+- Check if port 8000 is available
+- Verify no firewall blocking
+
+### Database connection errors
+- Verify PostgreSQL is running: `pg_ctl status`
+- Check `DATABASE_URL` in `.env`
+- Ensure database exists: `psql -U postgres -l`
+
+### Import errors
+- Activate virtual environment
+- Reinstall dependencies: `pip install -r requirements.txt`
+
+### Migration errors
+- Check current migration: `alembic current`
+- Rollback if needed: `alembic downgrade -1`
+- Re-run: `alembic upgrade head`
+
+---
+
+## 📝 License
+
+This project is licensed under the MIT License.
+
+---
+
+## 📧 Contact & Support
+
+For questions, issues, or contributions, please contact the team or open an issue on GitHub.
+
+**Happy Problem Solving! 🚀**

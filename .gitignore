@@ -1,7 +1,18 @@
-# Environment variables
+# ============================================
+# Environment Variables & Secrets
+# ============================================
 .env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+firebase-credentials.json
+firebase-admin-sdk.json
 
+# ============================================
 # Python
+# ============================================
 __pycache__/
 *.py[cod]
 *$py.class
@@ -10,29 +21,88 @@ __pycache__/
 venv/
 env/
 ENV/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+.pytest_cache/
+.coverage
+htmlcov/
+*.cover
+*.log
 
+# ============================================
 # Database
+# ============================================
 *.db
 *.sqlite3
+*.db-journal
+db_report.txt
+db_info_endpoint.py
 
-# IDE
+# ============================================
+# IDE & Editors
+# ============================================
 .vscode/
 .idea/
 *.swp
 *.swo
+*.sublime-project
+*.sublime-workspace
+.vscode-test
+.history/
 
+# ============================================
 # OS
+# ============================================
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
+desktop.ini
 
-# Logs
-*.log
-
+# ============================================
 # Dependencies
+# ============================================
 node_modules/
 problem-shelf-frontend/node_modules/
+problem-shelf-frontend-backup/
+bower_components/
+jspm_packages/
 
-# Build
+# ============================================
+# Build & Distribution
+# ============================================
 build/
 dist/
 *.egg-info/
+.eggs/
+wheels/
+*.egg
+*.whl
+
+# ============================================
+# Test & Output Files
+# ============================================
+*.txt
+!requirements.txt
+!alembic/README
+*.json
+!package.json
+!package-lock.json
+!tsconfig.json
+problems.json
+test_output.txt
+github_test_output.txt
+scraper_test_results.txt
+
+# ============================================
+# Temporary & Backup Files
+# ============================================
+*.tmp
+*.temp
+*.bak
+*.backup
+*~
