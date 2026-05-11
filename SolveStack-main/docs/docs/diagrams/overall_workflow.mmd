@@ -1,0 +1,17 @@
+graph TD
+    classDef step fill:#bae6fd,stroke:#0284c7,stroke-width:2px,color:#000
+
+    S1("1. Scheduled Scrapers Run"):::step
+    S2("2. Data Ingestion & Cleaning (SHA-256 Dedupe)"):::step
+    S3("3. Compute Engineering Impact Score (EIS)"):::step
+    S4("4. Generate Vector Embeddings"):::step
+    S5("5. Live Update (Real-time Problem Sync)"):::step
+    S6("6. Intent-Aware Search Discovery"):::step
+    S7("7. Squad Formation & Collaboration"):::step
+
+    S1 --> S2
+    S2 --> S3
+    S3 --> S4
+    S4 --> S5
+    S5 --> S6
+    S6 --> S7

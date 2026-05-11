@@ -1,0 +1,17 @@
+graph LR
+    classDef component fill:#4f46e5,stroke:#312e81,stroke-width:2px,color:#fff
+    classDef data fill:#e5e7eb,stroke:#9ca3af,stroke-width:2px,color:#000
+
+    RawData["Raw Problem Data"]:::data
+    DataCleaner["Data Cleaning Layer (Deduplication)"]:::component
+    Heuristics["Heuristics Evaluator (Keywords, Complexity)"]:::component
+    AIModel["Groq API (LLM Assessor)"]:::component
+    Normalizer["Score Normalizer (0-100)"]:::component
+    EISOutput["Final EIS & Difficulty Mapping"]:::data
+
+    RawData --> DataCleaner
+    DataCleaner --> Heuristics
+    DataCleaner --> AIModel
+    Heuristics --> Normalizer
+    AIModel --> Normalizer
+    Normalizer --> EISOutput

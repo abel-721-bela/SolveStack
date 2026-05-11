@@ -1,0 +1,17 @@
+stateDiagram-v2
+    [*] --> ViewingProblem: User views a problem
+
+    ViewingProblem --> ExpressedInterest: Clicks "Interested"
+    ViewingProblem --> RequestingCollab: Clicks "Start Squad" / "Request Collaboration" (auto-marks interest)
+
+    ExpressedInterest --> RequestingCollab: Clicks "Start Squad"
+    RequestingCollab --> PendingSquad: Squad Created (Waiting for peers)
+
+    PendingSquad --> ActiveSquad: Another user joins the Squad
+    PendingSquad --> SquadDissolved: User deletes Squad/Leaves
+
+    ActiveSquad --> Collaborating: Users chat / Real-time sync
+    Collaborating --> ActiveSquad: New problem insights
+
+    ActiveSquad --> SquadDissolved: Final member leaves
+    SquadDissolved --> [*]

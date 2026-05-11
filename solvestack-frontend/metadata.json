@@ -1,0 +1,9 @@
+
+{
+  "name": "SolveStack - Problem Discovery Platform",
+  "description": "A real-world problem discovery & collaboration platform for developers to find meaningful projects and build solutions together.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}

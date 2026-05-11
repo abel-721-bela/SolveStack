@@ -1,0 +1,49 @@
+graph TD
+    classDef frontend fill:#3b82f6,stroke:#1d4ed8,stroke-width:2px,color:#fff
+    classDef backend fill:#10b981,stroke:#047857,stroke-width:2px,color:#fff
+    classDef db fill:#f59e0b,stroke:#b45309,stroke-width:2px,color:#fff
+    classDef external fill:#8b5cf6,stroke:#5b21b6,stroke-width:2px,color:#fff
+
+    subgraph "Frontend Applications"
+        WebUI["Web Application (React)"]:::frontend
+        MobileUI["Mobile App (Expo/React Native)"]:::frontend
+    end
+
+    subgraph "Backend Services (FastAPI)"
+        API["API Gateway / Main Router"]:::backend
+        AuthService["Authentication Service"]:::backend
+        SearchEngine["Intent-Aware Hybrid Search"]:::backend
+        ScoringEngine["Engineering Impact Scoring (EIS)"]:::backend
+        CollabService["Collaboration & Squads"]:::backend
+        ScraperManager["Scraper Service Worker"]:::backend
+    end
+
+    subgraph "Data Storage"
+        PG["PostgreSQL"]:::db
+        Vectors["pgvector (Semantic Search)"]:::db
+        FTS["Full-Text Search Indices"]:::db
+    end
+
+    subgraph "External Integrations"
+        GroqAPI["Groq API (LLM Inference/Roadmaps)"]:::external
+        DataSources["Data Sources (GitHub, Web)"]:::external
+    end
+
+    WebUI <--> API
+    MobileUI <--> API
+
+    API <--> AuthService
+    API <--> SearchEngine
+    API <--> CollabService
+    API <--> ScoringEngine
+
+    SearchEngine <--> Vectors
+    SearchEngine <--> FTS
+    CollabService <--> PG
+    AuthService <--> PG
+
+    ScraperManager --> DataSources
+    ScraperManager --> PG
+
+    SearchEngine --> GroqAPI
+    ScoringEngine --> GroqAPI

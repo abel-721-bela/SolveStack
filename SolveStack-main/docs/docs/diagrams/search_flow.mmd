@@ -1,0 +1,17 @@
+sequenceDiagram
+    participant User
+    participant QPS as Query Processing Service
+    participant Emb as Embedding Service
+    participant PG as PostgreSQL (Hybrid Search)
+    participant RR as Reranking Service
+
+    User->>QPS: Search Query (e.g., "React Native performance")
+    QPS->>QPS: Analyze Intent & Extract Keywords
+    QPS->>Emb: Generate Semantic Embeddings
+    Emb-->>QPS: Vector Representation
+    QPS->>PG: Execute Hybrid Query (Vector Similarity + FTS)
+    PG-->>QPS: Raw Search Results
+    QPS->>RR: Send Results for Relevance Reranking
+    RR->>RR: Apply Scoring Weights (EIS + Recency)
+    RR-->>QPS: Sorted Top Results
+    QPS-->>User: Display Search Results
